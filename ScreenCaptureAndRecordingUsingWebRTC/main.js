@@ -56,6 +56,7 @@ async function startCapture() {
     tracks.forEach(track => track.stop());
     videoElem.srcObject = null;
     recording = window.URL.createObjectURL(new Blob(chunks, {type: 'video/webm'}));
+    downloadCapture(evt);
   }
 
   function downloadCapture(evt){
