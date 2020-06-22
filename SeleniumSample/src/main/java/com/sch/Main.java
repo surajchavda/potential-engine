@@ -4,15 +4,14 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
 
 public class Main {
 	public static void main(String args[]) {
-		System.setProperty("webdriver.chrome.driver", "z:/opt/drivers/chromedriver.exe");
-		ChromeOptions options = new ChromeOptions();
-		//options.addArguments("auto-select-desktop-capture-source=Entire Screen");
-		//options.addArguments("enable-usermedia-screen-capturing");
-		options.addArguments("use-fake-ui-for-media-stream");		
-		WebDriver driver = new ChromeDriver(options);
+		boolean isChrome = false; // false assume using Firefox
+		WebDriver driver = getWebDriver(isChrome);		
 		String baseUrl = "http://localhost:8080/";
 		driver.get(baseUrl);
 		try {
@@ -25,5 +24,36 @@ public class Main {
 			e.printStackTrace();
 		}		
 		driver.close();
+	}
+	
+	private static WebDriver getWebDriver(boolean isChrome) {
+		WebDriver webDriver = null;
+		if(isChrome) {
+			System.setProperty("webdriver.chrome.driver", "z:/opt/drivers/chromedriver.exe");
+			ChromeOptions options = new ChromeOptions();
+			// Chrome Options
+			//options.addArguments("auto-select-desktop-capture-source=Entire Screen");
+			//options.addArguments("enable-usermedia-screen-capturing");
+			options.addArguments("use-fake-ui-for-media-stream");	
+			webDriver = new ChromeDriver(options);
+		} else {
+			System.setProperty("webdriver.gecko.driver","z:/opt/drivers/geckodriver.exe");
+			FirefoxOptions options = new FirefoxOptions();
+			//ProfilesIni profiles = new ProfilesIni();
+			//FirefoxProfile profile = profiles.getProfile("SeleniumTest");			
+			FirefoxProfile profile = new FirefoxProfile();
+			profile.setPreference("browser.download.folderList",2);
+			profile.setPreference("browser.download.manager.showWhenStarting", false);
+			profile.setPreference("browser.download.dir",
+			      "z:/tmp/");
+			profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+			      "application/zip,application/x-compress,application/octet-stream,video/webm");
+			options.setProfile(profile);			
+			//Firefox Options
+			options.addPreference("media.navigator.permission.disabled", true);
+			options.addPreference("media.navigator.streams.fake", true);
+			webDriver = new FirefoxDriver(options);
+		}
+		return webDriver;
 	}
 }
